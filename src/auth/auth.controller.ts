@@ -6,14 +6,24 @@ import {
   UseGuards,
   Get,
   UnauthorizedException,
+  BadRequestException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dtos/login.dto';
 import { JwtAuthGuard } from './strategies/jwt.strategy';
 import { AuthGuard } from '@nestjs/passport';
+import { SignUpDto } from './dtos/signup.dto';
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
+
+  @Post('signup')
+  async signup(@Body() body: SignUpDto) {
+    const { email, password } = body;
+    if (!email || !password)
+      throw new BadRequestException('Email and password are required');
+    return this.authService.signup(body);
+  }
 
   @Post('login') async login(@Body() loginDto: LoginDto) {
     const user = await this.authService.validateUser(
