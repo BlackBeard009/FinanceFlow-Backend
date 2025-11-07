@@ -17,7 +17,11 @@ export class User {
   @Prop({ default: [] })
   providers: string[];
 
-  @Prop({ default: {} })
+  @Prop({
+    type: Map,
+    of: String,
+    default: {},
+  })
   oauthIds: Record<string, string>;
 }
 
