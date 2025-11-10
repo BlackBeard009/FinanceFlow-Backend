@@ -5,6 +5,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { APP_PIPE } from '@nestjs/core';
 import { ValidationPipe } from './common/pipes/validation.pipe';
+import { AccountsModule } from './accounts/accounts.module';
 
 @Module({
   providers: [
@@ -18,6 +19,7 @@ import { ValidationPipe } from './common/pipes/validation.pipe';
     MongooseModule.forRoot(process.env.MONGO_URI!),
     UsersModule,
     AuthModule,
+    AccountsModule,
   ],
 })
 export class AppModule {}
