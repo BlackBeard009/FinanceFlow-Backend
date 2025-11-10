@@ -51,13 +51,44 @@ export class AuthService {
     return null;
   }
 
-  login(user: UserDocument) {
+  async login(user: UserDocument) {
     const payload: UserPayload = {
       sub: user._id as Types.ObjectId,
       email: user.email,
       providers: user.providers,
     };
-    return { access_token: this.jwtService.sign(payload) };
+
+    const accessToken = this.jwtService.sign(payload, {
+      secret: process.env.JWT_SECRET,
+      expiresIn: '15m',
+    });
+
+    const refreshToken = this.jwtService.sign(payload, {
+      secret: process.env.JWT_REFRESH_SECRET,
+      expiresIn: '7d',
+    });
+
+    const hashedRT = await bcrypt.hash(refreshToken, 10);
+    await this.usersService.updateRefreshToken(payload.sub, hashedRT);
+
+    return { access_token: accessToken, refresh_token: refreshToken };
+  }
+
+  async logout(user: UserDocument) {
+    await this.usersService.updateRefreshToken(
+      user._id as Types.ObjectId,
+      null,
+    );
+  }
+
+  async refreshToken(userId: Types.ObjectId, refreshToken: string) {
+    const user = await this.usersService.findById(userId);
+    if (!user || !user.refreshToken) throw new Error('Access Denied');
+
+    const matches = await bcrypt.compare(refreshToken, user.refreshToken);
+    if (!matches) throw new Error('Invalid Refresh Token');
+
+    return this.login(user);
   }
 
   async validateOAuthUser(

@@ -28,4 +28,11 @@ export class UsersService {
   async findById(id: Types.ObjectId) {
     return this.userModel.findById(id);
   }
+
+  async updateRefreshToken(
+    userId: Types.ObjectId,
+    refreshToken: string | null,
+  ) {
+    return this.userModel.findByIdAndUpdate(userId, { refreshToken });
+  }
 }

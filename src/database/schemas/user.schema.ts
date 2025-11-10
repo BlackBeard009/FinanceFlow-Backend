@@ -17,6 +17,9 @@ export class User {
   @Prop({ default: [] })
   providers: string[];
 
+  @Prop()
+  refreshToken?: string;
+
   @Prop({
     type: Map,
     of: String,
